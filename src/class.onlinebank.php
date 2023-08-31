@@ -21,6 +21,7 @@
 			
 			- Данные для создания запроса ArrayData:
 			* amount - сумма платежа
+			* currency - валюту пополнения (KZT, RUB) от 31.08.2023
 			* comment - комментарий продавца
 			* attributes - атрибуты
 			
@@ -33,7 +34,7 @@
 			* message[string] - причина неудачи
 		*/
 		public function CreatePayment(array $_ArrayData) {
-			$_Result = $this->Put($this->Server('/creation'), ['price' => $_ArrayData['amount'] * 1.00, 'shop' => $this->_Conf['kassaid'], 'secret' => $this->_Conf['secret_key'], 'comment' => $_ArrayData['comment'], 'attributes' => $_ArrayData['attributes']]);
+			$_Result = $this->Put($this->Server('/creation'), ['price' => $_ArrayData['amount'] * 1.00, 'currency' => $_ArrayData['currency'], 'shop' => $this->_Conf['kassaid'], 'secret' => $this->_Conf['secret_key'], 'comment' => $_ArrayData['comment'], 'attributes' => $_ArrayData['attributes']]);
 			
 			if($_Result = json_decode($_Result)) {
 				switch($_Result->alert) {
@@ -42,8 +43,7 @@
 						break;
 					}
 					default: {
-						echo $_Result->message;
-						die;
+						throw new Exception($_Result->message);
 					}
 				}
 			}
